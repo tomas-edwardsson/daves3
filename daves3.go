@@ -68,6 +68,14 @@ func handleFunc(
 			return
 		}
 		if r.Method == "GET" {
+			headResp, err := svc.HeadObject(&s3.HeadObjectInput{
+				Bucket: aws.String(s3bucket),
+				Key:    aws.String(r.URL.EscapedPath()),
+			})
+			if headResp.ContentLength == nil {
+				http.Error(w, "Not found", 404)
+				return
+			}
 			req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
 				Bucket: aws.String(s3bucket),
 				Key:    aws.String(r.URL.EscapedPath()),
